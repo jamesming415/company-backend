@@ -5,25 +5,27 @@ import { Pool } from "pg";
 // PostgreSQL connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 // Create table if not exists
 async function createTable() {
-  const query = `
-    CREATE TABLE IF NOT EXISTS contacts (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      message TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
-
   try {
-    await pool.query(query);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS contacts (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log("Contacts table ready");
   } catch (err) {
-    console.error("Error creating table:", err);
+    console.error("DB init error:", err);
   }
 }
 
@@ -167,6 +169,14 @@ app.post("/api/contact", async (req, res) => {
 });
 
 async function startServer() {
+  try {
+    const client = await pool.connect();
+    console.log("PostgreSQL connected");
+    client.release();
+  } catch (err) {
+    console.error("PostgreSQL connection failed:", err);
+  }
+  
   await createTable();
   app.listen(port, "0.0.0.0", () => {
     console.log(`DigitWise contact backend listening on port ${port}`);
