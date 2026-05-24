@@ -1,6 +1,6 @@
 import express from "express";
 import nodemailer from "nodemailer";
-import Pool from "pg";
+import { Pool } from "pg";
 
 // PostgreSQL connection
 const pool = new Pool({
