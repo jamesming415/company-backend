@@ -141,7 +141,7 @@ app.post("/api/contact", async (req, res) => {
       RETURNING *;
     `;
 
-    const values = [name, email, message];
+    const values = [contact.name, contact.email, contact.message];
 
     const result = await pool.query(insertQuery, values);
 
