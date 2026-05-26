@@ -1,6 +1,7 @@
 import express from "express";
 import nodemailer from "nodemailer";
 import { Pool } from "pg";
+import cors from "cors";
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -30,6 +31,7 @@ async function createTable() {
 }
 
 const app = express();
+app.use(cors());
 const port = process.env.PORT || 10000;
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
   .split(",")
